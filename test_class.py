@@ -28,9 +28,21 @@ class MyClass:
                 print(buffer)
 
 
-class OtherClass:
-    def a1(self):
-        pass
+class MySwitcher:
+    def work(self, pb):
+        op = pb.param
+        #forward buffer
+        if pb.input(0).elements():
+            #print(self.input(0).dtype())
+            #print(self.input(0).buffer())
+
+            out0 = pb.output(op).buffer()
+            in0 = pb.input(0).buffer()
+            n = min(len(out0), len(in0))
+            out0[:n] = in0[:n]
+            pb.input(0).consume(n)
+            pb.output(op).produce(n)
+
 
     def a2(self):
         pass

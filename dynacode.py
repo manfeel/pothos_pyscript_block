@@ -118,10 +118,14 @@ class dynacode(Pothos.Block):
         #setup output channels
         for i in range(outChans):
             self.setupOutput(i, dtype)
+        self.registerSlot('setDynamicParam')
         self.bindcls = None
 
-    def setTitle(self, title):
-        pass
+
+    def setDynamicParam(self, param):
+        print(type(param))
+        print(param)
+        self.param = param
 
     def loadScript(self, pspath):
         self.mod = import_file(pspath)
