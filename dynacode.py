@@ -160,7 +160,8 @@ class Dynacode(Pothos.Block):
             if key == className:
                 cc = self.getClassByName(className)
                 if not issubclass(cc, DynaProxy):
-                    raise Exception('{0} is not a subclass of {1}!'.format(cc, DynaProxy))
+                    print('ERROR: {0} is not a subclass of {1}!'.format(cc, DynaProxy))
+                    return
 
                 self.bindcls = cc(self)
 
@@ -168,7 +169,7 @@ class Dynacode(Pothos.Block):
                 for m in filter_method:
                     if hasattr(self.bindcls, m):
                         setattr(self, m, getattr(self.bindcls, m, None))
-                return;
+                return
 
         print('ERROR: class "{0}" has Nothing to bind!'.format(className))
 
