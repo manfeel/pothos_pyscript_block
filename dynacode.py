@@ -102,12 +102,42 @@ def checkAndCall(inst, func):
         op()
 
 
+# define slot decorator
+'''
+def signal_slot(method):
+    def inner(inst):
+        func_name = method.__name__
+        print("{0}.registerSlog('{1}')".format(inst, func_name))
+        inst.registerSlot(method)
+'''
+
+# https://stackoverflow.com/questions/5707589/calling-functions-by-array-index-in-python/5707605#5707605
+def makeRegistrar():
+    registry = {}
+    def registrar(func):
+        registry[func.__name__] = func
+        return func  # normally a decorator returns a wrapped function,
+                     # but here we return func unmodified, after registering it
+    registrar.all = registry
+    return registrar
+
+# NOTE: it's global effect!
+signal_slot = makeRegistrar()
+
+
 class DynaProxy(object):
     """
     Proxy class for dynamic subclass init the `self' var to parent.self var.
     """
     def __init__(self, dynacode_self):
         self.refClass = dynacode_self
+        #print(signal_slot.all)
+        try:
+            for func_name in signal_slot.all:
+                self.registerSlot(func_name)
+        except Exception, e:
+            print('ERROR: {0}'.format(e))
+
         # call subsequent init procedure
         try:
             self.init()
@@ -131,13 +161,17 @@ class Dynacode(Pothos.Block):
         # setup output channels
         for i in range(outChans):
             self.setupOutput(i, dtype)
-        self.registerSlot('setDynamicParam')
+        #self.registerSlot('setDynamicParam')
         # init instance var
         self.mod = None
         self.clz = None
         self.bindcls = None
         self.param = None
+        #print(signal_slot.all)
+        for func_name in signal_slot.all:
+            self.registerSlot(func_name)
 
+    @signal_slot
     def setDynamicParam(self, param):
         print('param is {0}, value={1}'.format(type(param), param))
         self.param = param

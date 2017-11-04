@@ -32,14 +32,36 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="dynacode.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="dynacode.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/dynacode.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.63826364">
-              <caret line="103" column="0" selection-start-line="103" selection-start-column="0" selection-end-line="103" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="178" column="33" selection-start-line="178" selection-start-column="33" selection-end-line="178" selection-end-column="33" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="__init__.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/__init__.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="2" column="34" selection-start-line="2" selection-start-column="34" selection-end-line="2" selection-end-column="34" />
+              <folding>
+                <element signature="e#0#31#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="inspect.py" pinned="false" current-in-tab="false">
+        <entry file="file:///usr/local/Cellar/python/2.7.13/Frameworks/Python.framework/Versions/2.7/lib/python2.7/inspect.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="245" column="4" selection-start-line="245" selection-start-column="4" selection-end-line="245" selection-end-column="4" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -54,11 +76,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="test_class.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="test_class.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/test_class.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="57" column="19" selection-start-line="57" selection-start-column="19" selection-end-line="57" selection-end-column="19" />
+            <state vertical-scroll-proportion="0.59003216">
+              <caret line="66" column="36" selection-start-line="66" selection-start-column="36" selection-end-line="66" selection-end-column="36" />
               <folding>
                 <element signature="e#0#10#0" expanded="true" />
               </folding>
@@ -83,10 +105,10 @@
       <list>
         <option value="$PROJECT_DIR$/test_load.py" />
         <option value="$PROJECT_DIR$/CMakeLists.txt" />
-        <option value="$PROJECT_DIR$/__init__.py" />
         <option value="$PROJECT_DIR$/README.md" />
-        <option value="$PROJECT_DIR$/test_class.py" />
+        <option value="$PROJECT_DIR$/__init__.py" />
         <option value="$PROJECT_DIR$/dynacode.py" />
+        <option value="$PROJECT_DIR$/test_class.py" />
       </list>
     </option>
   </component>
@@ -588,14 +610,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.024115756">
-          <caret line="1" column="32" selection-start-line="1" selection-start-column="32" selection-end-line="1" selection-end-column="32" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
@@ -607,29 +621,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file:///usr/local/Cellar/python/2.7.13/Frameworks/Python.framework/Versions/2.7/lib/python2.7/inspect.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33279744">
-          <caret line="245" column="4" selection-start-line="245" selection-start-column="4" selection-end-line="245" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/local/lib/python2.7/site-packages/Pothos/Block.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.6141479">
           <caret line="47" column="28" selection-start-line="47" selection-start-column="28" selection-end-line="47" selection-end-column="28" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test_class.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="57" column="19" selection-start-line="57" selection-start-column="19" selection-end-line="57" selection-end-column="19" />
-          <folding>
-            <element signature="e#0#10#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -641,12 +637,40 @@
         </state>
       </provider>
     </entry>
+    <entry file="file:///usr/local/Cellar/python/2.7.13/Frameworks/Python.framework/Versions/2.7/lib/python2.7/inspect.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="245" column="4" selection-start-line="245" selection-start-column="4" selection-end-line="245" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="2" column="34" selection-start-line="2" selection-start-column="34" selection-end-line="2" selection-end-column="34" />
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/dynacode.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.63826364">
-          <caret line="103" column="0" selection-start-line="103" selection-start-column="0" selection-end-line="103" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="178" column="33" selection-start-line="178" selection-start-column="33" selection-end-line="178" selection-end-column="33" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test_class.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.59003216">
+          <caret line="66" column="36" selection-start-line="66" selection-start-column="36" selection-end-line="66" selection-end-column="36" />
+          <folding>
+            <element signature="e#0#10#0" expanded="true" />
           </folding>
         </state>
       </provider>

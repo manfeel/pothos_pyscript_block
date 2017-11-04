@@ -48,7 +48,13 @@ def hexdump(src, length=16):
 
 
 class ArbitarySignals(dynacode.DynaProxy):
-    pass
+    @dynacode.signal_slot
+    def setFloatValue(self, value):
+        print(value)
+
+    @dynacode.signal_slot
+    def setIntValue(self, value):
+        print(value)
 
 
 class MySwitcher(dynacode.DynaProxy):
@@ -74,3 +80,7 @@ class MySwitcher(dynacode.DynaProxy):
     def deactivate(self):
         print('WoW, deactivate called!')
         self.paramChanged('end')
+
+    @dynacode.signal_slot
+    def setValue(self, value):
+        print(value)
