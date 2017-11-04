@@ -103,24 +103,6 @@ class DynaProxy(object):
         #print('getattr : {0}'.format(name))
         return getattr(self.refClass, name)
 
-    # ref from https://gist.github.com/sbz/1080258
-    def hexdump(src, length=16):
-        is_string = isinstance(src, str)
-
-        def getc(c):
-            d = ord(c) if is_string else c
-            return d
-
-        FILTER = ''.join([(len(repr(chr(x))) == 3) and chr(x) or '.' for x in range(256)])
-        lines = []
-
-        for c in xrange(0, len(src), length):
-            chars = src[c:c+length]
-            hex = ' '.join(["%02x" % getc(x) for x in chars])
-            printable = ''.join(["%s" % ((getc(x) <= 127 and FILTER[getc(x)]) or '.') for x in chars])
-            lines.append("%04x  %-*s |  %s\n" % (c, length*3, hex, printable))
-        return ''.join(lines)
-
 
 class Dynacode(Pothos.Block):
     def __init__(self, dtype, inChans, outChans):
