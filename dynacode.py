@@ -50,33 +50,14 @@ or an empty string to use the first class.
 */"""
 
 
-# ref from https://gist.github.com/sbz/1080258
-def hexdump(src, length=16):
-    is_string = isinstance(src, str)
-
-    def getc(c):
-        d = ord(c) if is_string else c
-        return d
-
-    FILTER = ''.join([(len(repr(chr(x))) == 3) and chr(x) or '.' for x in range(256)])
-    lines = []
-
-    for c in xrange(0, len(src), length):
-        chars = src[c:c+length]
-        hex = ' '.join(["%02x" % getc(x) for x in chars])
-        printable = ''.join(["%s" % ((getc(x) <= 127 and FILTER[getc(x)]) or '.') for x in chars])
-        lines.append("%04x  %-*s |  %s\n" % (c, length*3, hex, printable))
-    return ''.join(lines)
-
-
 def import_file(fpath):
-    '''
+    """
     fpath - the relative or absolute path to the .py file which is imported.
 
     Returns the imported module.
 
     NOTE: if import_file is called twice with the same module, the module is reloaded.
-    '''
+    """
     if hasattr(_os, 'getcwdu'):
         # python 2 returns question marks in os.path.realpath for
         # ascii input (eg '.').
@@ -108,38 +89,88 @@ def import_file(fpath):
 
     return module
 
+filter_method = ['work', 'activate', 'deactivate', 'propagateLabels']
+#dict_filter = lambda x, y: dict([ (i,x[i]) for i in x if i not in set(y) ])
 
-class dynacode(Pothos.Block):
+class DynaProxy(object):
+    """
+    Proxy class for dynamic subclass init the `self' var to parent.self var.
+    """
+    def __init__(self, dynacode_self):
+        self.refClass = dynacode_self
+
+    def __getattr__(self, name):
+        #print('getattr : {0}'.format(name))
+        return getattr(self.refClass, name)
+
+    # ref from https://gist.github.com/sbz/1080258
+    def hexdump(src, length=16):
+        is_string = isinstance(src, str)
+
+        def getc(c):
+            d = ord(c) if is_string else c
+            return d
+
+        FILTER = ''.join([(len(repr(chr(x))) == 3) and chr(x) or '.' for x in range(256)])
+        lines = []
+
+        for c in xrange(0, len(src), length):
+            chars = src[c:c+length]
+            hex = ' '.join(["%02x" % getc(x) for x in chars])
+            printable = ''.join(["%s" % ((getc(x) <= 127 and FILTER[getc(x)]) or '.') for x in chars])
+            lines.append("%04x  %-*s |  %s\n" % (c, length*3, hex, printable))
+        return ''.join(lines)
+
+
+class Dynacode(Pothos.Block):
     def __init__(self, dtype, inChans, outChans):
         Pothos.Block.__init__(self)
-        #setup input channels
+        # setup input channels
         for i in range(inChans):
             self.setupInput(i, dtype)
-        #setup output channels
+        # setup output channels
         for i in range(outChans):
             self.setupOutput(i, dtype)
         self.registerSlot('setDynamicParam')
+        # init instance var
+        self.mod = None
+        self.clz = None
         self.bindcls = None
-
+        self.param = None
 
     def setDynamicParam(self, param):
-        print(type(param))
-        print(param)
+        print('param is {0}, value={1}'.format(type(param), param))
         self.param = param
 
     def loadScript(self, pspath):
         self.mod = import_file(pspath)
         print('{0} has been loaded'.format(self.mod))
         self.clz = inspect.getmembers(self.mod, inspect.isclass)
-        print(self.clz)
+        #print(self.clz)
+
+    def getClassByName(self, className):
+        for k, v in self.clz:
+            if k == className:
+                return v
+        return None
 
     def bindClass(self, className):
-        print('bind class name: ' + className)
+        #print('bind class name: ' + className)
         for key, val in self.clz:
             if key == className:
-                self.bindcls = val()
+                cc = self.getClassByName(className)
+                if not issubclass(cc, DynaProxy):
+                    raise Exception('{0} is not a subclass of {1}!'.format(cc, DynaProxy))
+
+                self.bindcls = cc(self)
+
+                # bind some method
+                for m in filter_method:
+                    if hasattr(self.bindcls, m):
+                        setattr(self, m, getattr(self.bindcls, m, None))
                 return;
-        print('Nothing to bind!')
+
+        print('ERROR: class "{0}" has Nothing to bind!'.format(className))
 
     # call the same method in script
     def checkAndCall(self):
@@ -148,7 +179,7 @@ class dynacode(Pothos.Block):
         parentFunc = sys._getframe(1).f_code.co_name
         op = getattr(self.bindcls, parentFunc, None)
         if callable(op):
-            op(self)
+            op()
 
     # json overlay
     def overlay(self):
@@ -173,14 +204,3 @@ class dynacode(Pothos.Block):
         v = json.dumps(js)
         #print(v)
         return v
-
-    def activate(self):
-        #print('activate')
-        self.checkAndCall()
-
-    def deactivate(self):
-        #print('deactivate')
-        self.checkAndCall()
-
-    def work(self):
-        self.checkAndCall()

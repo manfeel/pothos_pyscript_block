@@ -1,7 +1,8 @@
 import sys
 import numpy
+import dynacode
 
-class MyClass:
+class MyClass(object):
     def activate(self, pb):
         print(sys._getframe(1).f_code.co_name)
         print(pb.mod)
@@ -28,22 +29,20 @@ class MyClass:
                 print(buffer)
 
 
-class MySwitcher:
-    def work(self, pb):
-        op = pb.param
+class MySwitcher(dynacode.DynaProxy):
+    def work(self):
+        op = self.param
         #forward buffer
-        if pb.input(0).elements():
-            #print(self.input(0).dtype())
-            #print(self.input(0).buffer())
-
-            out0 = pb.output(op).buffer()
-            in0 = pb.input(0).buffer()
+        if self.input(0).elements():
+            out0 = self.output(op).buffer()
+            in0 = self.input(0).buffer()
             n = min(len(out0), len(in0))
             out0[:n] = in0[:n]
-            pb.input(0).consume(n)
-            pb.output(op).produce(n)
+            self.input(0).consume(n)
+            self.output(op).produce(n)
 
+    def activate(self):
+        print('WoW, activate called!')
 
-    def a2(self):
-        pass
-
+    def deactivate(self):
+        print('WoW, deactivate called!')

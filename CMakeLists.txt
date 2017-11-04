@@ -17,7 +17,7 @@ POTHOS_PYTHON_UTIL(
         __init__.py
         dynacode.py
     FACTORIES
-        "/blocks/dynacode:dynacode"
+        "/blocks/dynacode:Dynacode"
     DESTINATION dynacode
     ENABLE_DOCS
 )

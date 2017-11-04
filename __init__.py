@@ -1,1 +1,2 @@
-from . dynacode import dynacode
+from . dynacode import Dynacode
+from . dynacode import DynaProxy
