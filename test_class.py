@@ -46,7 +46,15 @@ def hexdump(src, length=16):
         lines.append("%04x  %-*s |  %s\n" % (c, length*3, hex, printable))
     return ''.join(lines)
 
+
+class ArbitarySignals(dynacode.DynaProxy):
+    pass
+
+
 class MySwitcher(dynacode.DynaProxy):
+    def init(self):
+        self.registerSignal('paramChanged')
+
     def work(self):
         op = self.param
         #forward buffer
@@ -54,14 +62,15 @@ class MySwitcher(dynacode.DynaProxy):
             out0 = self.output(op).buffer()
             in0 = self.input(0).buffer()
             n = min(len(out0), len(in0))
-            out0[:n] = in0[:n]
 
-            print(hexdump('abc'))
+            out0[:n] = in0[:n]
             self.input(0).consume(n)
             self.output(op).produce(n)
 
     def activate(self):
         print('WoW, activate called!')
+        self.paramChanged('haha')
 
     def deactivate(self):
         print('WoW, deactivate called!')
+        self.paramChanged('end')

@@ -23,13 +23,13 @@ Dynamic load and run a python script from file.
 
 |param inChans [Num input Channels] The number of input channels.
 This parameter controls the number of input channels.
-|widget SpinBox(minimum=1)
+|widget SpinBox(minimum=0)
 |default 1
 |preview disable
 
 |param outChans [Num output Channels] The number of output channels.
 This parameter controls the number of output channels.
-|widget SpinBox(minimum=1)
+|widget SpinBox(minimum=0)
 |default 1
 |preview disable
 
@@ -92,16 +92,34 @@ def import_file(fpath):
 filter_method = ['work', 'activate', 'deactivate', 'propagateLabels']
 #dict_filter = lambda x, y: dict([ (i,x[i]) for i in x if i not in set(y) ])
 
+
+def checkAndCall(inst, func):
+    # get the func name of caller
+    # sys._getframe().f_code.co_name will return the own func name
+    #    func = sys._getframe(1).f_code.co_name
+    op = getattr(inst, func, None)
+    if callable(op):
+        op()
+
+
 class DynaProxy(object):
     """
     Proxy class for dynamic subclass init the `self' var to parent.self var.
     """
     def __init__(self, dynacode_self):
         self.refClass = dynacode_self
+        # call subsequent init procedure
+        try:
+            self.init()
+        except Exception, e:
+            print('ERROR: {0}'.format(e))
 
+    # such mechanism will lead to query any attr can be exist! why?
+    # the return value is lambda! why?
     def __getattr__(self, name):
-        #print('getattr : {0}'.format(name))
-        return getattr(self.refClass, name)
+        a = getattr(self.refClass, name, None)
+        #print('getattr : {0}={1}'.format(name, a))
+        return a
 
 
 class Dynacode(Pothos.Block):
@@ -154,15 +172,6 @@ class Dynacode(Pothos.Block):
                 return
 
         print('ERROR: class "{0}" has Nothing to bind!'.format(className))
-
-    # call the same method in script
-    def checkAndCall(self):
-        # get the func name of caller
-        # sys._getframe().f_code.co_name will return the own func name
-        parentFunc = sys._getframe(1).f_code.co_name
-        op = getattr(self.bindcls, parentFunc, None)
-        if callable(op):
-            op()
 
     # json overlay
     def overlay(self):
