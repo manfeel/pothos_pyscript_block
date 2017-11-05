@@ -60,6 +60,7 @@ class ArbitarySignals(dynacode.DynaProxy):
 class MySwitcher(dynacode.DynaProxy):
     def init(self):
         self.registerSignal('paramChanged')
+        self.param = None
 
     def work(self):
         op = self.param
@@ -82,5 +83,6 @@ class MySwitcher(dynacode.DynaProxy):
         self.paramChanged('end')
 
     @dynacode.signal_slot
-    def setValue(self, value):
-        print(value)
+    def setDynamicParam(self, param):
+        print('param is {0}, value={1}'.format(type(param), param))
+        self.param = param

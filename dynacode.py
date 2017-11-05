@@ -109,7 +109,7 @@ def signal_slot(method):
         func_name = method.__name__
         print("{0}.registerSlog('{1}')".format(inst, func_name))
         inst.registerSlot(method)
-'''
+
 
 # https://stackoverflow.com/questions/5707589/calling-functions-by-array-index-in-python/5707605#5707605
 def makeRegistrar():
@@ -123,6 +123,51 @@ def makeRegistrar():
 
 # NOTE: it's global effect!
 signal_slot = makeRegistrar()
+'''
+
+
+# ========================= decorator for self wareness ==============================
+# https://stackoverflow.com/questions/5910703/howto-get-all-methods-of-a-python-class-with-given-decorator
+def makeRegisteringDecorator(foreignDecorator):
+    """
+        Returns a copy of foreignDecorator, which is identical in every
+        way(*), except also appends a .decorator property to the callable it
+        spits out.
+    """
+    def newDecorator(func):
+        # Call to newDecorator(method)
+        # Exactly like old decorator, but output keeps track of what decorated it
+        R = foreignDecorator(func) # apply foreignDecorator, like call to foreignDecorator(method) would have done
+        R.decorator = newDecorator # keep track of decorator
+        #R.original = func         # might as well keep track of everything!
+        return R
+
+    newDecorator.__name__ = foreignDecorator.__name__
+    newDecorator.__doc__ = foreignDecorator.__doc__
+    # (*)We can be somewhat "hygienic", but newDecorator still isn't signature-preserving, i.e. you will not be able to get a runtime list of parameters. For that, you need hackish libraries...but in this case, the only argument is func, so it's not a big issue
+
+    return newDecorator
+
+def methodsWithDecorator(cls, decorator):
+    """
+        Returns all methods in CLS with DECORATOR as the
+        outermost decorator.
+
+        DECORATOR must be a "registering decorator"; one
+        can make any decorator "registering" via the
+        makeRegisteringDecorator function.
+    """
+    for maybeDecorated in cls.__dict__.values():
+        if hasattr(maybeDecorated, 'decorator'):
+            if maybeDecorated.decorator == decorator:
+                #print(maybeDecorated)
+                yield maybeDecorated
+
+def _slot(method):
+    return method
+
+signal_slot = makeRegisteringDecorator(_slot)
+# ========================= decorator for self wareness ==============================
 
 
 class DynaProxy(object):
@@ -131,10 +176,14 @@ class DynaProxy(object):
     """
     def __init__(self, dynacode_self):
         self.refClass = dynacode_self
-        #print(signal_slot.all)
+        #print(list(methodsWithDecorator(self.__class__, signal_slot)))
         try:
-            for func_name in signal_slot.all:
+            for func in list(methodsWithDecorator(self.__class__, signal_slot)):
+                func_name = func.__name__
+                print('registerSlot : {0}'.format(func))
                 self.registerSlot(func_name)
+                # IMPORTANT: bind the slot to parent class
+                setattr(self.refClass, func_name, getattr(self, func_name, None))
         except Exception, e:
             print('ERROR: {0}'.format(e))
 
@@ -142,7 +191,7 @@ class DynaProxy(object):
         try:
             self.init()
         except Exception, e:
-            print('ERROR: {0}'.format(e))
+            print('ERROR: [{0}] {1}'.format(self.__class__, e))
 
     # such mechanism will lead to query any attr can be exist! why?
     # the return value is lambda! why?
@@ -161,20 +210,10 @@ class Dynacode(Pothos.Block):
         # setup output channels
         for i in range(outChans):
             self.setupOutput(i, dtype)
-        #self.registerSlot('setDynamicParam')
         # init instance var
         self.mod = None
         self.clz = None
         self.bindcls = None
-        self.param = None
-        #print(signal_slot.all)
-        for func_name in signal_slot.all:
-            self.registerSlot(func_name)
-
-    @signal_slot
-    def setDynamicParam(self, param):
-        print('param is {0}, value={1}'.format(type(param), param))
-        self.param = param
 
     def loadScript(self, pspath):
         self.mod = import_file(pspath)
