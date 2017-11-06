@@ -1,6 +1,7 @@
 import sys
 import numpy
 import dynacode
+import Pothos
 
 class MyClass(object):
     def activate(self, pb):
@@ -61,6 +62,13 @@ class MySwitcher(dynacode.DynaProxy):
     def init(self):
         self.registerSignal('paramChanged')
         self.param = None
+        env = Pothos.ProxyEnvironment("managed")
+        e = env.findProxy('Pothos/Util/EvalEnvironment').make()
+        #e.registerConstantObj('s', should_be_object)
+        r = e.eval('sampRate')
+        print('r : {0}'.format(r))
+        r = e.eval('s*2')
+        print('r : {0}'.format(r))
 
     def work(self):
         op = self.param
@@ -76,7 +84,6 @@ class MySwitcher(dynacode.DynaProxy):
 
     def activate(self):
         print('WoW, activate called!')
-        self.paramChanged('haha')
 
     def deactivate(self):
         print('WoW, deactivate called!')
