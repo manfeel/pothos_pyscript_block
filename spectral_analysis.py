@@ -1,5 +1,5 @@
 import sys
-import numpy
+import numpy as np
 import dynacode
 import Pothos
 from scipy import signal
@@ -7,6 +7,22 @@ import pickle
 #import matplotlib.pyplot as plt
 
 file='/Users/manfeel/Downloads/out.bson'
+
+class fft_record(dynacode.DynaProxy):
+    def init(self):
+        # set default sample rate
+        self.sampRate = 10e6
+
+    @dynacode.signal_slot
+    def setSampRate(self, sampRate):
+        self.sampRate = sampRate
+
+    def work(self):
+        sampRate = self.globals['s']
+        if self.input(0).elements():
+            print(sampRate)
+            print('ele:{0}'.format(self.input(0).elements()))
+
 
 class SpectralAnalysis(dynacode.DynaProxy):
     def work(self):
@@ -18,6 +34,7 @@ class SpectralAnalysis(dynacode.DynaProxy):
             n = len(in0)
             #print(n)
 
+            r = np.fft.fft(in0)
             # deal spectrogram
             f, t, Sxx = signal.spectrogram(in0, 10e6)
             data = {}
@@ -40,7 +57,7 @@ class SpectralAnalysis(dynacode.DynaProxy):
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
-    with open(file, 'rb') as inp:
+    with open('/Users/manfeel/Downloads/sig.bin', 'rb') as inp:
         data = pickle.load(inp)
     t = data['t']
     f = data['f']

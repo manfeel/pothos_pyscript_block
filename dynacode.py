@@ -42,12 +42,22 @@ This parameter controls the number of output channels.
 |param className[Bind Class] The class name of the load script,
 or an empty string to use the first class.
 |widget ComboBox(editable=false)
-|default ""
+|default ""|preview valid
+
+|param globals[Globals] A map of variable names to values.
+The globals map allows global variables from the topology
+as well as other expressions to enter the evaluation operation.
+
+For example this mapping lets us use foo, bar, and baz in the expression
+to represent several different globals and combinations of expressions:
+{"foo": myGlobal, "bar": "test123", "baz": myNum+12345}
+|default {}
 |preview valid
 
 |factory /blocks/dynacode(dtype, inChans, outChans)
 |initializer loadScript(pspath)
 |initializer bindClass(className)
+|setter setGlobals(globals)
 */"""
 
 
@@ -192,7 +202,7 @@ class DynaProxy(object):
         try:
             self.init()
         except Exception, e:
-            print('ERROR: [{0}] {1}'.format(self.__class__, e))
+            print('WARNING: [{0}] {1}'.format(self.__class__, e))
 
     # such mechanism will lead to query any attr can be exist! why?
     # the return value is lambda! why?
@@ -215,6 +225,7 @@ class Dynacode(Pothos.Block):
         self.mod = None
         self.clz = None
         self.bindcls = None
+        self.globals = {}
 
     def loadScript(self, pspath):
         self.mod = import_file(pspath)
@@ -246,6 +257,10 @@ class Dynacode(Pothos.Block):
                 return
 
         print('ERROR: class "{0}" has Nothing to bind!'.format(className))
+
+    def setGlobals(self, param):
+        self.globals = param
+        print(self.globals)
 
     # json overlay
     def overlay(self):
