@@ -223,6 +223,7 @@ class Dynacode(Pothos.Block):
         for i in range(outChans):
             self.setupOutput(i, dtype)
         # init instance var
+        self.json_overlay = None
         self.mod = None
         self.clz = None
         self.bindcls = None
@@ -269,6 +270,9 @@ class Dynacode(Pothos.Block):
 
     # json overlay
     def overlay(self):
+        if self.json_overlay:
+            return self.json_overlay
+
         js = {"params": [{
             "key": "className",
             "options": [
@@ -287,6 +291,5 @@ class Dynacode(Pothos.Block):
             v = '"'+ key + '"'
             opts.append({'name': key, 'value':v})
         #print(opts)
-        v = json.dumps(js)
-        #print(v)
-        return v
+        self.json_overlay = json.dumps(js)
+        return self.json_overlay
