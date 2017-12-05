@@ -4,6 +4,7 @@ import dynacode
 import Pothos
 from scipy import signal
 import pickle
+import os
 #import matplotlib.pyplot as plt
 
 file='/Users/manfeel/Downloads/out.bson'
@@ -17,11 +18,36 @@ class fft_record(dynacode.DynaProxy):
     def setSampRate(self, sampRate):
         self.sampRate = sampRate
 
+    def activate(self):
+        self.sampRate = self.globals['s']
+
     def work(self):
-        sampRate = self.globals['s']
-        if self.input(0).elements():
-            print(sampRate)
-            print('ele:{0}'.format(self.input(0).elements()))
+        n = self.input(0).elements()
+        #print(n)
+        if n < 1024:
+            return
+
+        try:
+            in0 = self.input(0).buffer()
+            out = self.output(0).buffer()
+            n = min(len(in0), len(out))
+            rst = np.fft.fft(in0)
+            Lo = 50e3
+            Hi = 250e3
+            l = len(rst)
+            for i in range(l):
+                #print("rst[%d]=%s" % (i, str(rst[i])))
+                if i<int(l*Lo/self.sampRate) or i > int(l*Hi/self.sampRate): rst[i]=0
+
+            irst = np.fft.ifft(rst)
+            out[:n] = irst[:n]
+            self.input(0).consume(n)
+            self.output(0).produce(n)
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            print(exc_type, fname, exc_tb.tb_lineno)
+
 
 
 class SpectralAnalysis(dynacode.DynaProxy):

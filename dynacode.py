@@ -42,7 +42,8 @@ This parameter controls the number of output channels.
 |param className[Bind Class] The class name of the load script,
 or an empty string to use the first class.
 |widget ComboBox(editable=false)
-|default ""|preview valid
+|default ""
+|preview valid
 
 |param globals[Globals] A map of variable names to values.
 The globals map allows global variables from the topology
@@ -228,10 +229,12 @@ class Dynacode(Pothos.Block):
         self.globals = {}
 
     def loadScript(self, pspath):
-        self.mod = import_file(pspath)
-        print('{0} has been loaded'.format(self.mod))
-        self.clz = inspect.getmembers(self.mod, inspect.isclass)
-        #print(self.clz)
+        try:
+            self.mod = import_file(pspath)
+            print('{0} has been loaded'.format(self.mod))
+            self.clz = inspect.getmembers(self.mod, inspect.isclass)
+        except:
+            print('ERROR: script "{0}" load failed'.format(pspath))
 
     def getClassByName(self, className):
         for k, v in self.clz:
@@ -240,23 +243,25 @@ class Dynacode(Pothos.Block):
         return None
 
     def bindClass(self, className):
-        #print('bind class name: ' + className)
-        for key, val in self.clz:
-            if key == className:
-                cc = self.getClassByName(className)
-                if not issubclass(cc, DynaProxy):
-                    print('ERROR: {0} is not a subclass of {1}!'.format(cc, DynaProxy))
+        try:
+            for key, val in self.clz:
+                if key == className:
+                    cc = self.getClassByName(className)
+                    if not issubclass(cc, DynaProxy):
+                        print('ERROR: {0} is not a subclass of {1}!'.format(cc, DynaProxy))
+                        return
+
+                    self.bindcls = cc(self)
+
+                    # bind some method
+                    for m in filter_method:
+                        if hasattr(self.bindcls, m):
+                            setattr(self, m, getattr(self.bindcls, m, None))
                     return
+        except Exception, e:
+            print('ERROR: in bindClass! {0}'.format(e))
 
-                self.bindcls = cc(self)
-
-                # bind some method
-                for m in filter_method:
-                    if hasattr(self.bindcls, m):
-                        setattr(self, m, getattr(self.bindcls, m, None))
-                return
-
-        print('ERROR: class "{0}" has Nothing to bind!'.format(className))
+        #print('ERROR: class "{0}" has Nothing to bind!'.format(className))
 
     def setGlobals(self, param):
         self.globals = param
